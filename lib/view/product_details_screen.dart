@@ -79,7 +79,12 @@ class ProductDetailsScreen extends StatelessWidget {
 
             // product details
             Padding(
-              padding: EdgeInsets.all(screenWidth * 0.04),
+              padding: EdgeInsets.symmetric(
+                horizontal: screenWidth * 0.04,
+                vertical:
+                    screenHeight *
+                    0.02, // Use screenHeight for vertical padding
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -97,6 +102,9 @@ class ProductDetailsScreen extends StatelessWidget {
                       ),
                     ],
                   ),
+                  SizedBox(
+                    height: screenHeight * 0.02,
+                  ), // Use screenHeight for spacing
                 ],
               ),
             ),
