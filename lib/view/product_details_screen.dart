@@ -2,6 +2,7 @@
 
 import 'package:ecommerce_ui/models/product.dart';
 import 'package:ecommerce_ui/utils/app_textstyles.dart';
+import 'package:ecommerce_ui/view/widgets/size_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -79,12 +80,7 @@ class ProductDetailsScreen extends StatelessWidget {
 
             // product details
             Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: screenWidth * 0.04,
-                vertical:
-                    screenHeight *
-                    0.02, // Use screenHeight for vertical padding
-              ),
+              padding: EdgeInsets.all(screenWidth * 0.04),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -100,11 +96,34 @@ class ProductDetailsScreen extends StatelessWidget {
                           ),
                         ),
                       ),
+                      Text(
+                        "\$${product.price.toStringAsFixed(2)}",
+                        style: AppTextstyles.withColor(
+                          AppTextstyles.h2,
+                          Theme.of(context).textTheme.headlineMedium!.color!,
+                        ),
+                      ),
                     ],
                   ),
-                  SizedBox(
-                    height: screenHeight * 0.02,
-                  ), // Use screenHeight for spacing
+
+                  Text(
+                    product.category,
+                    style: AppTextstyles.withColor(
+                      AppTextstyles.bodyMedium,
+                      isDark ? Colors.grey[400]! : Colors.grey[600]!,
+                    ),
+                  ),
+                  SizedBox(height: screenHeight * 0.02),
+                  Text(
+                    "Select Size",
+                    style: AppTextstyles.withColor(
+                      AppTextstyles.labelMedium,
+                      Theme.of(context).textTheme.bodyLarge!.color!,
+                    ),
+                  ),
+                  SizedBox(height: screenHeight * 0.01),
+                  // size selector
+                  const SizeSelector(),
                 ],
               ),
             ),
