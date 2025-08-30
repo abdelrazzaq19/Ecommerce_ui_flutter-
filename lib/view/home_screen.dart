@@ -1,10 +1,11 @@
 import 'package:ecommerce_ui/controllers/theme_controller.dart';
+import 'package:ecommerce_ui/view/all_products_screen.dart';
 import 'package:ecommerce_ui/view/widgets/category_chips.dart';
 import 'package:ecommerce_ui/view/widgets/custom_search_bar.dart';
 import 'package:ecommerce_ui/view/widgets/product_grid.dart';
 import 'package:ecommerce_ui/view/widgets/sale_banner.dart';
 import 'package:flutter/material.dart';
-import 'package:get/state_manager.dart';
+import 'package:get/get.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -91,7 +92,7 @@ class HomeScreen extends StatelessWidget {
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   GestureDetector(
-                    onTap: () {},
+                    onTap: () => Get.to(()=> AllProductsScreen()),
                     child: Text(
                       "See All",
                       style: TextStyle(color: Theme.of(context).primaryColor),

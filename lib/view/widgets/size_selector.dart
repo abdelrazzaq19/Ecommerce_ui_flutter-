@@ -20,6 +20,15 @@ class _SizeSelectorState extends State<SizeSelector> {
           child: ChoiceChip(
             label: Text(sizes[index]),
             selected: selectedSize == index,
+            onSelected: (bool selected) {
+              setState(() {
+                selectedSize = selected ? index : selectedSize;
+              });
+            },
+            selectedColor: Theme.of(context).primaryColor,
+            labelStyle: TextStyle(
+              color: selectedSize == index ? Colors.white : Colors.black,
+            ),
           ),
         ),
       ),

@@ -124,10 +124,75 @@ class ProductDetailsScreen extends StatelessWidget {
                   SizedBox(height: screenHeight * 0.01),
                   // size selector
                   const SizeSelector(),
+                  SizedBox(height: screenHeight * 0.02),
+                  Text(
+                    "Description",
+                    style: AppTextstyles.withColor(
+                      AppTextstyles.labelMedium,
+                      Theme.of(context).textTheme.bodyLarge!.color!,
+                    ),
+                  ),
+                  SizedBox(height: screenHeight * 0.01),
+                  Text(
+                    product.description,
+                    style: AppTextstyles.withColor(
+                      AppTextstyles.bodySmall,
+                      isDark ? Colors.grey[400]! : Colors.grey[600]!,
+                    ),
+                  ),
                 ],
               ),
             ),
           ],
+        ),
+      ),
+      //buttons
+      bottomNavigationBar: SafeArea(
+        child: Padding(
+          padding: EdgeInsets.all(screenWidth * 0.04),
+          child: Row(
+            children: [
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: () {},
+                  style: OutlinedButton.styleFrom(
+                    padding: EdgeInsets.symmetric(
+                      vertical: screenHeight * 0.02,
+                    ),
+                    side: BorderSide(
+                      color: isDark ? Colors.white70 : Colors.black12,
+                    ),
+                  ),
+                  child: Text(
+                    "Add To Cart",
+                    style: AppTextstyles.withColor(
+                      AppTextstyles.buttonMedium,
+                      Theme.of(context).textTheme.bodyLarge!.color!,
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(width: screenWidth * 0.04),
+              Expanded(
+                child: ElevatedButton(
+                  onPressed: () {},
+                  style: ElevatedButton.styleFrom(
+                    padding: EdgeInsets.symmetric(
+                      vertical: screenHeight * 0.02,
+                    ),
+                    backgroundColor: Theme.of(context).primaryColor,
+                  ),
+                  child: Text(
+                    "Buy Now",
+                    style: AppTextstyles.withColor(
+                      AppTextstyles.buttonMedium,
+                      Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
