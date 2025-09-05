@@ -26,7 +26,7 @@ class AccountScreen extends StatelessWidget {
         ),
         actions: [
           IconButton(
-            onPressed: () => Get.to(()=> SettingsScreen()),
+            onPressed: () => Get.to(() => SettingsScreen()),
             icon: Icon(
               Icons.settings_outlined,
               color: isDark ? Colors.white : Colors.black,
