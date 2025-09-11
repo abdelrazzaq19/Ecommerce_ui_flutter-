@@ -2,6 +2,8 @@
 
 import 'package:ecommerce_ui/controllers/auth_controller.dart';
 import 'package:ecommerce_ui/utils/app_textstyles.dart';
+import 'package:ecommerce_ui/view/edit%20profile/screens/edit_profile_screen.dart';
+import 'package:ecommerce_ui/view/help%20center/screens/help_center_screen.dart';
 import 'package:ecommerce_ui/view/my%20orders/view/screens/my_orders_screen.dart';
 import 'package:ecommerce_ui/view/settings_screen.dart';
 import 'package:ecommerce_ui/view/shipping%20address/shipping_address_screen.dart';
@@ -14,7 +16,6 @@ class AccountScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final screenSize = MediaQuery.of(context).size;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
@@ -82,7 +83,7 @@ Widget _buildProfileSection(BuildContext context) {
         ),
         SizedBox(height: 16),
         OutlinedButton(
-          onPressed: () {},
+          onPressed: () => Get.to(() => EditProfileScreen()),
           style: OutlinedButton.styleFrom(
             padding: EdgeInsets.symmetric(horizontal: 32, vertical: 12),
             side: BorderSide(color: isDark ? Colors.white70 : Colors.black12),
@@ -154,7 +155,7 @@ Widget _buildMenuSection(BuildContext context) {
               } else if (item['title'] == 'Shipping Address') {
                 Get.to(() => ShippingAddressScreen());
               } else if (item['title'] == 'Help Center') {
-                // navigation to help center screen
+                Get.to(() => HelpCenterScreen());
               }
             },
           ),
