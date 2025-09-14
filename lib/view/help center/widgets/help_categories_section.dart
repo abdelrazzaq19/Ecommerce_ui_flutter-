@@ -36,6 +36,7 @@ class HelpCategoriesSection extends StatelessWidget {
               mainAxisSpacing: 16,
               childAspectRatio: 1.5,
             ),
+            itemCount: categories.length,
             itemBuilder: (context, index) {
               return CategoryCard(
                 title: categories[index]['title'] as String,

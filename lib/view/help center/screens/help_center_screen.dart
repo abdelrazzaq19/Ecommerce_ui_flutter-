@@ -1,6 +1,7 @@
 // ignore_for_file: deprecated_member_use
 
 import 'package:ecommerce_ui/utils/app_textstyles.dart';
+import 'package:ecommerce_ui/view/help%20center/widgets/contact_support_section.dart';
 import 'package:ecommerce_ui/view/help%20center/widgets/help_categories_section.dart';
 import 'package:ecommerce_ui/view/help%20center/widgets/popular_questions_section.dart';
 import 'package:flutter/material.dart';
@@ -38,7 +39,9 @@ class HelpCenterScreen extends StatelessWidget {
           SizedBox(height: 24),
           PopularQuestionsSection(),
           SizedBox(height: 24),
-          const HelpCategoriesSection(),
+          HelpCategoriesSection(),
+          SizedBox(height: 24),
+          ContactSupportSection(),
           ],
         ),
       ),

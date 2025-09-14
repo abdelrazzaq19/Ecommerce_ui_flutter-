@@ -2,6 +2,8 @@
 
 import 'package:ecommerce_ui/controllers/theme_controller.dart';
 import 'package:ecommerce_ui/utils/app_textstyles.dart';
+import 'package:ecommerce_ui/view/privacy%20policy/views/screens/privacy_policy_screen.dart';
+import 'package:ecommerce_ui/view/terms%20of%20services/view/screens/terms_of_service_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -56,12 +58,14 @@ class SettingsScreen extends StatelessWidget {
                 "Privacy Policy",
                 "View our privacy policy",
                 Icons.privacy_tip_outlined,
+                onTap: () => Get.to(() => PrivacyPolicyScreen()),
               ),
               _buildNavigationTile(
                 context,
                 "Terms of Service",
                 "Read our terms of service",
                 Icons.description_outlined,
+                onTap: () => Get.to(() => TermsOfServiceScreen()),
               ),
             ]),
 
@@ -195,45 +199,48 @@ class SettingsScreen extends StatelessWidget {
     BuildContext context,
     String title,
     String subtitle,
-    IconData icon,
-  ) {
+    IconData icon, {
+    VoidCallback? onTap,
+  }) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    return Container(
-      margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: isDark
-                ? Colors.black.withOpacity(0.2)
-                : Colors.grey.withOpacity(0.1),
-            blurRadius: 8,
-            offset: Offset(0, 2),
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        decoration: BoxDecoration(
+          color: Theme.of(context).cardColor,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: isDark
+                  ? Colors.black.withOpacity(0.2)
+                  : Colors.grey.withOpacity(0.1),
+              blurRadius: 8,
+              offset: Offset(0, 2),
+            ),
+          ],
+        ),
+        child: ListTile(
+          leading: Icon(icon, color: Theme.of(context).primaryColor),
+          title: Text(
+            title,
+            style: AppTextstyles.withColor(
+              AppTextstyles.bodyMedium,
+              Theme.of(context).textTheme.bodyLarge!.color!,
+            ),
           ),
-        ],
-      ),
-      child: ListTile(
-        leading: Icon(icon, color: Theme.of(context).primaryColor),
-        title: Text(
-          title,
-          style: AppTextstyles.withColor(
-            AppTextstyles.bodyMedium,
-            Theme.of(context).textTheme.bodyLarge!.color!,
+          subtitle: Text(
+            subtitle,
+            style: AppTextstyles.withColor(
+              AppTextstyles.bodySmall,
+              isDark ? Colors.grey[400]! : Colors.grey[600]!,
+            ),
+          ),
+          trailing: Icon(
+            Icons.chevron_right,
+            color: isDark ? Colors.grey[400] : Colors.grey[600],
           ),
         ),
-        subtitle: Text(
-          subtitle,
-          style: AppTextstyles.withColor(
-            AppTextstyles.bodySmall,
-            isDark ? Colors.grey[400]! : Colors.grey[600]!,
-          ),
-        ),
-        trailing: Icon(
-          Icons.chevron_right,
-          color: isDark ? Colors.grey[400] : Colors.grey[600],
-        ),
-        onTap: () {},
       ),
     );
   }
