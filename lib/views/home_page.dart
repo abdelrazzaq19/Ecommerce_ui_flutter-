@@ -31,7 +31,7 @@ class HomePage extends StatelessWidget {
             Product product = productProvider.products[index];
             return ListTile(
               title: Text(product.title),
-              subtitle: Text("\$${product.price}"),
+              subtitle: Text('\$${product.price}'),
               onTap: () {
                 Navigator.push(
                   context,
