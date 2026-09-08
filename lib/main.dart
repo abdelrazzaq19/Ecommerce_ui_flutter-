@@ -1,39 +1,35 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'state/product_provider.dart';
+
 import 'state/auth_provider.dart';
 import 'state/cart_provider.dart';
+import 'state/product_provider.dart';
 import 'views/home_page.dart';
 
 void main() {
-  runApp(
-    MultiProvider(
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    // The provider graph lives inside MyApp rather than main() so widget tests
+    // can pump `const MyApp()` directly and get a fully wired app.
+    return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => ProductProvider()),
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => CartProvider()),
       ],
-      child: const MyApp(), // Use 'const' here
-    ),
-  );
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key}); // Converted 'key' to a super parameter
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter E-Commerce',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
+      child: MaterialApp(
+        title: 'Flutter E-Commerce',
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+        ),
+        home: const HomePage(),
       ),
-      home: const HomePage(), // Use 'const' here if HomePage constructor is const
     );
   }
 }
-
-
-
-
-
