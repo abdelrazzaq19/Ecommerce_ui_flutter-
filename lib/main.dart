@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'state/auth_provider.dart';
 import 'state/cart_provider.dart';
 import 'state/product_provider.dart';
+import 'theme/app_theme.dart';
 import 'views/home_page.dart';
 
 void main() {
@@ -25,9 +26,10 @@ class MyApp extends StatelessWidget {
       ],
       child: MaterialApp(
         title: 'Flutter E-Commerce',
-        theme: ThemeData(
-          primarySwatch: Colors.blue,
-        ),
+        theme: AppTheme.light,
+        darkTheme: AppTheme.dark,
+        // Task 17 replaces this with the user's persisted preference.
+        themeMode: ThemeMode.system,
         home: const HomePage(),
       ),
     );

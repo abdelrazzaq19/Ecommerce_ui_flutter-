@@ -1,6 +1,6 @@
 # TODO: Ecommerce App Modernization
 
-Plan: [tasks/plan.md](plan.md) · Status: awaiting human approval · Updated 2026-09-08
+Plan: [tasks/plan.md](plan.md) · Status: Phase 0 complete (Tasks 1-3) · Updated 2026-09-08
 
 Verify commands: `flutter analyze` · `flutter test` · `flutter run -d chrome`
 
@@ -15,10 +15,13 @@ Verify commands: `flutter analyze` · `flutter test` · `flutter run -d chrome`
   - [x] `assets/images/` declared; `analysis_options.yaml` tightened (`prefer_single_quotes`, `unawaited_futures`)
   - Deferred: `strict-casts` / `strict-raw-types` move to Task 4 — they only flag the unsafe `Product.fromJson` that Task 4 rewrites
 
-- [ ] **Task 2 — Material 3 design system and theme tokens** (S, needs T1)
-  - [ ] `AppTheme.light` / `AppTheme.dark` with `useMaterial3: true`, `ColorScheme.fromSeed`
-  - [ ] `app_tokens.dart` spacing/radius scale
-  - [ ] Renders legibly in light and dark
+- [x] **Task 2 — Material 3 design system and theme tokens** (S, needs T1) — DONE
+  - [x] `AppTheme.light` / `AppTheme.dark`, `useMaterial3: true`, seeded from brand `#3D5AFE`
+  - [x] `app_tokens.dart`: `AppSpacing`, `AppRadius`, `AppElevation`, `AppDurations`, `AppSizes`, `AppBreakpoints`
+  - [x] Component themes centralised (app bar, card, buttons, inputs, chips, nav bar, snackbar, sheets, dividers, list tiles)
+  - [x] Tests assert Material 3, brand hue, WCAG AA contrast on primary/surface/error pairs, dark scaffold, 4dp grid, 48dp tap floor
+  - [x] `themeMode: ThemeMode.system` wired in `main.dart` (persisted selector lands in Task 17)
+  - Visual light/dark sweep deferred to Task 7 — the home page is still blank until B1 is fixed, so there is nothing to look at yet
 
 - [x] **Task 3 — Real test harness replacing the counter test** (S, needs T1) — DONE
   - [x] `flutter test` green, 3 tests (fixes B10)
@@ -149,4 +152,4 @@ Verify commands: `flutter analyze` · `flutter test` · `flutter run -d chrome`
 - [x] **Platforms:** all six — Android, iOS, web, Windows, macOS, Linux. Layouts must be responsive, and
       every package chosen must support all six (`shared_preferences`, `cached_network_image`, `intl` do).
 - [x] **Auth:** stays a local simulation. No backend, no real credentials, no payment data.
-- [ ] **Brand color:** user asked for "brand color" but has not named one. **Blocks Task 2.**
+- [x] **Brand color:** `#3D5AFE` (indigo). Seeds both Material 3 schemes.
