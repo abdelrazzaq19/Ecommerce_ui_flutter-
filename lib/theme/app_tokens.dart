@@ -22,6 +22,10 @@ abstract final class AppRadius {
   static const double lg = 16;
   static const double xl = 24;
   static const double pill = 999;
+
+  /// Cards and image plates. Slightly softer than [lg], which is used for
+  /// controls, so surfaces read as calmer than the things you tap.
+  static const double card = 20;
 }
 
 /// Elevation steps. Material 3 leans on tonal surfaces, so these stay low.
@@ -52,6 +56,9 @@ abstract final class AppSizes {
   /// Wide desktop windows get a centred column instead of a 4000px-wide grid.
   static const double maxContentWidth = 1200;
 
+  /// A single product reads better in a narrower column than the grid does.
+  static const double detailContentWidth = 900;
+
   static const double skeletonRowHeight = 220;
 }
 
@@ -63,9 +70,13 @@ abstract final class AppBreakpoints {
   static const double expanded = 1200;
 
   /// Product-grid column count for a given available width.
+  ///
+  /// These thresholds are the grid's own, not the M3 window classes: a 1150dp
+  /// window minus a navigation rail still deserves four cards per row, and
+  /// three would leave each card uncomfortably large.
   static int columnsForWidth(double width) {
-    if (width < compact) return 2;
-    if (width < expanded) return 3;
+    if (width < 600) return 2;
+    if (width < 1000) return 3;
     return 4;
   }
 

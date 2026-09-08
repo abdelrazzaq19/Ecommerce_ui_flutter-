@@ -1,18 +1,21 @@
-import 'package:ecommerce_app/main.dart';
+import 'package:ecommerce_app/app.dart';
 import 'package:ecommerce_app/views/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'helpers/fake_products.dart';
+import 'helpers/fake_repository.dart';
 import 'helpers/pump_app.dart';
 
 void main() {
   group('app boot', () {
     testWidgets('MyApp builds and lands on the home page', (tester) async {
-      await tester.pumpWidget(const MyApp());
+      await tester.pumpWidget(MyApp(repository: FakeProductRepository()));
+      await tester.pumpAndSettle();
 
       expect(find.byType(MaterialApp), findsOneWidget);
       expect(find.byType(HomePage), findsOneWidget);
+      expect(find.byType(NavigationBar), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
   });

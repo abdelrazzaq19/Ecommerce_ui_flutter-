@@ -14,9 +14,13 @@ analyzer:
     - windows/**
     - macos/**
     - linux/**
-  # NOTE: `language: strict-casts / strict-raw-types` is enabled in Task 4,
-  # together with the null-safe Product model and typed API service. Turning it
-  # on before those land only produces errors the model rewrite already fixes.
+  language:
+    # Enabled in Task 4 alongside the null-safe Product model: it is the lint
+    # that catches dynamic JSON being assigned to typed fields.
+    strict-casts: true
+    # Enabled in Task 10, once the raw `FutureBuilder(` in cart_page.dart was
+    # gone.
+    strict-raw-types: true
 
 linter:
   rules:
