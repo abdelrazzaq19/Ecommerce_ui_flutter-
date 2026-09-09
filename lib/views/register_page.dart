@@ -9,27 +9,33 @@ import '../theme/app_tokens.dart';
 import '../utils/validators.dart';
 import '../widgets/demo_notice.dart';
 
-/// Sign in.
+/// Create an account.
 ///
-/// The old version had no validation and no form: it accepted anything, then
-/// pushed a route that was never registered, which threw.
-class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+/// The README has always claimed registration validating name, email, phone
+/// and password. Until now there was no registration page at all.
+class RegisterPage extends StatefulWidget {
+  const RegisterPage({super.key});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  State<RegisterPage> createState() => _RegisterPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _RegisterPageState extends State<RegisterPage> {
   final _formKey = GlobalKey<FormState>();
+  final _nameController = TextEditingController();
   final _emailController = TextEditingController();
+  final _phoneController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _confirmController = TextEditingController();
   bool _obscurePassword = true;
 
   @override
   void dispose() {
+    _nameController.dispose();
     _emailController.dispose();
+    _phoneController.dispose();
     _passwordController.dispose();
+    _confirmController.dispose();
     super.dispose();
   }
 
@@ -40,8 +46,10 @@ class _LoginPageState extends State<LoginPage> {
     final navigator = Navigator.of(context);
     final messenger = ScaffoldMessenger.of(context);
 
-    final ok = await auth.login(
+    final ok = await auth.register(
+      name: _nameController.text,
       email: _emailController.text,
+      phone: _phoneController.text,
       password: _passwordController.text,
     );
     if (!mounted || !ok) return;
@@ -49,12 +57,9 @@ class _LoginPageState extends State<LoginPage> {
     messenger
       ..hideCurrentSnackBar()
       ..showSnackBar(
-        SnackBar(content: Text('Signed in as ${auth.session!.displayName}')),
+        SnackBar(content: Text('Welcome, ${auth.session!.displayName}')),
       );
 
-    // Sign-in is usually reached by pushing on top of the shell, so returning
-    // is a pop. Falling back to the home route covers a deep link straight to
-    // /login, where there is nothing to pop back to.
     if (navigator.canPop()) {
       navigator.pop();
     } else {
@@ -68,7 +73,7 @@ class _LoginPageState extends State<LoginPage> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Sign in')),
+      appBar: AppBar(title: const Text('Create account')),
       body: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: AppSizes.formWidth),
@@ -78,21 +83,26 @@ class _LoginPageState extends State<LoginPage> {
             child: ListView(
               padding: const EdgeInsets.all(AppSpacing.md),
               children: [
-                Text('Welcome back', style: theme.textTheme.headlineSmall),
-                const SizedBox(height: AppSpacing.xs),
-                Text(
-                  'Sign in to keep your cart, wishlist and orders.',
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
+                Text('Create your account', style: theme.textTheme.headlineSmall),
+                const SizedBox(height: AppSpacing.lg),
+                TextFormField(
+                  controller: _nameController,
+                  validator: Validators.name,
+                  textCapitalization: TextCapitalization.words,
+                  textInputAction: TextInputAction.next,
+                  autofillHints: const [AutofillHints.name],
+                  decoration: const InputDecoration(
+                    labelText: 'Full name',
+                    prefixIcon: Icon(Icons.person_outline_rounded),
                   ),
                 ),
-                const SizedBox(height: AppSpacing.lg),
+                const SizedBox(height: AppSpacing.md),
                 TextFormField(
                   controller: _emailController,
                   validator: Validators.email,
                   keyboardType: TextInputType.emailAddress,
-                  autofillHints: const [AutofillHints.email],
                   textInputAction: TextInputAction.next,
+                  autofillHints: const [AutofillHints.email],
                   decoration: const InputDecoration(
                     labelText: 'Email',
                     prefixIcon: Icon(Icons.mail_outline_rounded),
@@ -100,18 +110,32 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 const SizedBox(height: AppSpacing.md),
                 TextFormField(
+                  controller: _phoneController,
+                  validator: Validators.phone,
+                  keyboardType: TextInputType.phone,
+                  textInputAction: TextInputAction.next,
+                  autofillHints: const [AutofillHints.telephoneNumber],
+                  decoration: const InputDecoration(
+                    labelText: 'Phone',
+                    prefixIcon: Icon(Icons.phone_outlined),
+                    helperText: 'Digits, spaces, brackets, + and - are fine',
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.md),
+                TextFormField(
                   controller: _passwordController,
-                  validator: Validators.password,
+                  validator: Validators.newPassword,
                   obscureText: _obscurePassword,
-                  textInputAction: TextInputAction.done,
-                  onFieldSubmitted: (_) => _submit(),
+                  textInputAction: TextInputAction.next,
                   decoration: InputDecoration(
                     labelText: 'Password',
                     prefixIcon: const Icon(Icons.lock_outline_rounded),
+                    helperText:
+                        'At least ${Validators.minPasswordLength} characters, '
+                        'letters and numbers',
                     suffixIcon: IconButton(
-                      tooltip: _obscurePassword
-                          ? 'Show password'
-                          : 'Hide password',
+                      tooltip:
+                          _obscurePassword ? 'Show password' : 'Hide password',
                       icon: Icon(
                         _obscurePassword
                             ? Icons.visibility_outlined
@@ -121,6 +145,21 @@ class _LoginPageState extends State<LoginPage> {
                         () => _obscurePassword = !_obscurePassword,
                       ),
                     ),
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.md),
+                TextFormField(
+                  controller: _confirmController,
+                  validator: (value) => Validators.confirmPassword(
+                    value,
+                    _passwordController.text,
+                  ),
+                  obscureText: _obscurePassword,
+                  textInputAction: TextInputAction.done,
+                  onFieldSubmitted: (_) => _submit(),
+                  decoration: const InputDecoration(
+                    labelText: 'Repeat password',
+                    prefixIcon: Icon(Icons.lock_reset_rounded),
                   ),
                 ),
                 if (auth.errorMessage != null) ...[
@@ -140,18 +179,22 @@ class _LoginPageState extends State<LoginPage> {
                           dimension: 20,
                           child: CircularProgressIndicator(strokeWidth: 2),
                         )
-                      : const Text('Sign in'),
+                      : const Text('Create account'),
                 ),
                 const SizedBox(height: AppSpacing.sm),
                 TextButton(
                   onPressed: auth.isSubmitting
                       ? null
                       : () => Navigator.of(context)
-                          .pushReplacementNamed(AppRoutes.register),
-                  child: const Text('New here? Create an account'),
+                          .pushReplacementNamed(AppRoutes.login),
+                  child: const Text('Already have an account? Sign in'),
                 ),
                 const SizedBox(height: AppSpacing.md),
-                const DemoAccountNotice(),
+                const DemoAccountNotice(
+                  message: 'Demo account. Your details are saved on this device '
+                      'only, your password is not stored at all, and nothing is '
+                      'sent to a server.',
+                ),
               ],
             ),
           ),

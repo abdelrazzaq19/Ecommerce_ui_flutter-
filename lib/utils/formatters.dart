@@ -18,3 +18,12 @@ final NumberFormat _compact = NumberFormat.compact(locale: 'en_US');
 
 /// Formats a review count, e.g. `1200` becomes `1.2K`.
 String formatCount(int count) => _compact.format(count);
+
+final DateFormat _dateTime = DateFormat('d MMM yyyy, HH:mm', 'en_US');
+final DateFormat _date = DateFormat('d MMM yyyy', 'en_US');
+
+/// `9 Sep 2026, 14:05` — for an order receipt.
+String formatDateTime(DateTime value) => _dateTime.format(value);
+
+/// `9 Sep 2026` — for an order history row.
+String formatDate(DateTime value) => _date.format(value);

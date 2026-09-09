@@ -1,12 +1,17 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import '../models/product.dart';
 import '../state/cart_provider.dart';
 import '../state/catalog_provider.dart';
+import '../state/wishlist_provider.dart';
 import '../theme/app_tokens.dart';
 import '../widgets/app_states.dart';
 import '../widgets/category_chips.dart';
+import '../widgets/offline_banner.dart';
 import '../widgets/product_card.dart';
 import '../widgets/sort_sheet.dart';
 import 'product_detail_page.dart';
@@ -57,12 +62,30 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _addToCart(BuildContext context, Product product) {
+    // A short tap back: on a phone this is the only confirmation you get
+    // without looking at the screen.
+    unawaited(HapticFeedback.lightImpact());
     context.read<CartProvider>().addToCart(product);
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
       ..showSnackBar(
         SnackBar(
           content: Text('${product.title} added to cart'),
+          duration: AppDurations.slow * 4,
+        ),
+      );
+  }
+
+  void _toggleFavorite(BuildContext context, Product product) {
+    unawaited(HapticFeedback.selectionClick());
+    final saved = context.read<WishlistProvider>().toggle(product.id);
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          content: Text(
+            saved ? '${product.title} saved' : '${product.title} removed',
+          ),
           duration: AppDurations.slow * 4,
         ),
       );
@@ -94,6 +117,13 @@ class _HomePageState extends State<HomePage> {
                     physics: const AlwaysScrollableScrollPhysics(),
                     slivers: [
                       _header(),
+                      if (catalog.isShowingCachedData)
+                        SliverToBoxAdapter(
+                          child: OfflineBanner(
+                            cachedAt: catalog.cachedAt,
+                            onRetry: catalog.refresh,
+                          ),
+                        ),
                       if (catalog.status == CatalogStatus.ready)
                         SliverToBoxAdapter(child: _filterBar(context, catalog)),
                       ..._body(context, catalog, columns),
@@ -242,14 +272,20 @@ class _HomePageState extends State<HomePage> {
                 crossAxisCount: columns,
                 crossAxisSpacing: AppSpacing.md,
                 mainAxisSpacing: AppSpacing.md,
-                childAspectRatio: 0.74,
+                childAspectRatio: AppBreakpoints.gridAspectRatio(
+                        MediaQuery.textScalerOf(context).scale(1),
+                      ),
               ),
               itemCount: products.length,
               itemBuilder: (context, index) {
                 final product = products[index];
+                final wishlist = context.watch<WishlistProvider>();
+
                 return ProductCard(
                   key: ValueKey(product.id),
                   product: product,
+                  isFavorite: wishlist.contains(product.id),
+                  onFavoriteToggle: () => _toggleFavorite(context, product),
                   onAddToCart: () => _addToCart(context, product),
                   onTap: () => Navigator.of(context).push(
                     MaterialPageRoute<void>(

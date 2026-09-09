@@ -1,11 +1,16 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import '../models/product.dart';
 import '../state/cart_provider.dart';
 import '../state/shell_tab_controller.dart';
+import '../state/wishlist_provider.dart';
 import '../theme/app_tokens.dart';
 import '../utils/formatters.dart';
+import '../widgets/product_card.dart';
 import '../widgets/product_image.dart';
 import '../widgets/quantity_stepper.dart';
 import '../widgets/rating_stars.dart';
@@ -31,6 +36,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
   Product get _product => widget.product;
 
   void _addToCart() {
+    unawaited(HapticFeedback.lightImpact());
     context.read<CartProvider>().addToCart(_product, quantity: _quantity);
 
     final shell = context.read<ShellTabController>();
@@ -48,6 +54,19 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
               shell.goTo(ShellTabController.cartTab);
             },
           ),
+        ),
+      );
+  }
+
+  void _toggleFavorite() {
+    unawaited(HapticFeedback.selectionClick());
+    final saved = context.read<WishlistProvider>().toggle(_product.id);
+
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          content: Text(saved ? 'Saved for later' : 'Removed from saved'),
         ),
       );
   }
@@ -71,6 +90,16 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                 pinned: true,
                 expandedHeight: 320,
                 backgroundColor: scheme.surface,
+                actions: [
+                  FavoriteButton(
+                    onPlate: false,
+                    isFavorite:
+                        context.watch<WishlistProvider>().contains(_product.id),
+                    onPressed: _toggleFavorite,
+                    title: _product.title,
+                  ),
+                  const SizedBox(width: AppSpacing.sm),
+                ],
                 flexibleSpace: FlexibleSpaceBar(
                   background: ColoredBox(
                     // Product art is shot on white; it needs a light plate in both

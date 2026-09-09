@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../models/product.dart';
+import '../routes.dart';
 import '../state/cart_provider.dart';
 import '../state/catalog_provider.dart';
 import '../state/shell_tab_controller.dart';
@@ -387,8 +388,8 @@ class _CheckoutBar extends StatelessWidget {
                 ],
               ),
               FilledButton.icon(
-                // Wired up in Task 15.
-                onPressed: null,
+                onPressed: () =>
+                    Navigator.of(context).pushNamed(AppRoutes.checkout),
                 icon: const Icon(Icons.lock_outline),
                 label: const Text('Checkout'),
               ),

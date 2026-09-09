@@ -26,9 +26,11 @@ class LocalStore {
   static const String _cartKey = 'cart';
   static const String _wishlistKey = 'wishlist';
   static const String _sessionKey = 'session';
+  static const String _accountsKey = 'accounts';
   static const String _themeModeKey = 'themeMode';
   static const String _searchHistoryKey = 'searchHistory';
   static const String _ordersKey = 'orders';
+  static const String _addressKey = 'address';
   static const String _catalogKey = 'catalog';
   static const String _catalogCachedAtKey = 'catalogCachedAt';
 
@@ -59,14 +61,23 @@ class LocalStore {
 
   // ------------------------------------------------------------ wishlist
 
-  Set<int> readWishlist() {
+  /// Saved product ids, newest first.
+  ///
+  /// Order is kept, not a `Set`: a wishlist reads best with the most recently
+  /// saved item at the top. Duplicates are dropped on read.
+  List<int> readWishlist() {
     final decoded = _decode(_wishlistKey);
-    if (decoded is! List) return {};
-    return decoded.whereType<int>().toSet();
+    if (decoded is! List) return [];
+
+    final ids = <int>[];
+    for (final id in decoded.whereType<int>()) {
+      if (!ids.contains(id)) ids.add(id);
+    }
+    return ids;
   }
 
-  Future<void> writeWishlist(Set<int> productIds) =>
-      _prefs.setString(_wishlistKey, json.encode(productIds.toList()));
+  Future<void> writeWishlist(List<int> productIds) =>
+      _prefs.setString(_wishlistKey, json.encode(productIds));
 
   // ------------------------------------------------------------- session
 
@@ -80,6 +91,20 @@ class LocalStore {
       _prefs.setString(_sessionKey, json.encode(session));
 
   Future<void> clearSession() => _prefs.remove(_sessionKey);
+
+  /// Profiles that have registered on this device.
+  ///
+  /// Separate from the session on purpose: signing out ends a session, it does
+  /// not delete the account. Passwords are not part of this — see the note at
+  /// the top of the class.
+  List<Map<String, dynamic>> readAccounts() {
+    final decoded = _decode(_accountsKey);
+    if (decoded is! List) return [];
+    return decoded.whereType<Map<String, dynamic>>().toList();
+  }
+
+  Future<void> writeAccounts(List<Map<String, dynamic>> accounts) =>
+      _prefs.setString(_accountsKey, json.encode(accounts));
 
   // --------------------------------------------------------------- theme
 
@@ -132,6 +157,15 @@ class LocalStore {
   Future<void> writeOrders(List<Map<String, dynamic>> orders) =>
       _prefs.setString(_ordersKey, json.encode(orders));
 
+  /// The last shipping address used, so checkout does not ask for it twice.
+  Map<String, dynamic>? readAddress() {
+    final decoded = _decode(_addressKey);
+    return decoded is Map<String, dynamic> ? decoded : null;
+  }
+
+  Future<void> writeAddress(Map<String, dynamic> address) =>
+      _prefs.setString(_addressKey, json.encode(address));
+
   // ------------------------------------------------------- catalog cache
 
   /// The last catalog fetched, so a cold launch has something to render before
@@ -142,16 +176,18 @@ class LocalStore {
     return Product.listFromJson(decoded);
   }
 
-  Future<void> writeCachedCatalog(List<Product> products) async {
-    await _prefs.setString(
-      _catalogKey,
-      json.encode(products.map((product) => product.toJson()).toList()),
-    );
-    await _prefs.setString(
-      _catalogCachedAtKey,
-      DateTime.now().toIso8601String(),
-    );
-  }
+  /// Both keys are written together, with no await between them: a reader that
+  /// finds the catalog must also find its timestamp.
+  Future<void> writeCachedCatalog(List<Product> products) => Future.wait([
+        _prefs.setString(
+          _catalogKey,
+          json.encode(products.map((product) => product.toJson()).toList()),
+        ),
+        _prefs.setString(
+          _catalogCachedAtKey,
+          DateTime.now().toIso8601String(),
+        ),
+      ]);
 
   /// When the cache was written, used to decide whether it is worth showing.
   DateTime? readCatalogCachedAt() {
@@ -167,9 +203,11 @@ class LocalStore {
       _cartKey,
       _wishlistKey,
       _sessionKey,
+      _accountsKey,
       _themeModeKey,
       _searchHistoryKey,
       _ordersKey,
+      _addressKey,
       _catalogKey,
       _catalogCachedAtKey,
     ]) {

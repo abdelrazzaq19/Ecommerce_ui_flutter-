@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import '../models/product.dart';
 import '../repositories/product_repository.dart';
 import '../services/api_exception.dart';
+import '../services/local_store.dart';
 
 /// What the catalog screen should be showing.
 enum CatalogStatus { initial, loading, ready, empty, error }
@@ -32,16 +33,36 @@ enum CatalogSort {
 class CatalogProvider extends ChangeNotifier {
   CatalogProvider({
     ProductRepository? repository,
+    LocalStore? store,
     int pageSize = 8,
     bool autoLoad = true,
   })  : _repository = repository ?? ApiProductRepository(),
+        _store = store,
         _pageSize = pageSize {
+    _seedFromCache();
     if (autoLoad) {
-      unawaited(load());
+      // Seeded runs are a refresh, not a first load: the shopper already has
+      // products on screen and should not watch them turn back into skeletons.
+      unawaited(load(refresh: _status == CatalogStatus.ready));
     }
   }
 
+  /// Puts the last catalog on screen synchronously, before any request goes
+  /// out, so a second launch opens on products instead of a spinner.
+  void _seedFromCache() {
+    final cached = _store?.readCachedCatalog();
+    if (cached == null || cached.isEmpty) return;
+
+    _all.addAll(cached);
+    _categories = _derivedCategories();
+    _status = CatalogStatus.ready;
+    _isStale = true;
+    _cachedAt = _store?.readCatalogCachedAt();
+    _recompute(resetPaging: true);
+  }
+
   final ProductRepository _repository;
+  final LocalStore? _store;
   final int _pageSize;
   final List<Product> _all = [];
   List<Product> _filtered = const [];
@@ -55,9 +76,19 @@ class CatalogProvider extends ChangeNotifier {
   String? _selectedCategory;
   CatalogSort _sort = CatalogSort.featured;
 
+  bool _isStale = false;
+  DateTime? _cachedAt;
+
   CatalogStatus get status => _status;
   ApiException? get error => _error;
   bool get isLoading => _isLoading;
+
+  /// True while the products on screen came from the cache and the latest
+  /// refresh has not succeeded. Drives the offline banner.
+  bool get isShowingCachedData => _isStale && _all.isNotEmpty;
+
+  /// When the cached catalog was written, for the banner's wording.
+  DateTime? get cachedAt => _cachedAt;
 
   /// The full catalog. Cart and wishlist resolve their ids against this.
   List<Product> get allProducts => List.unmodifiable(_all);
@@ -127,12 +158,20 @@ class CatalogProvider extends ChangeNotifier {
           ..clear()
           ..addAll(value);
         _status = CatalogStatus.ready;
+        _isStale = false;
+        _cachedAt = DateTime.now();
+        unawaited(_store?.writeCachedCatalog(value));
       case EmptyResult<List<Product>>():
         _all.clear();
         _status = CatalogStatus.empty;
+        _isStale = false;
       case Failure<List<Product>>(:final error):
         _error = error;
-        _status = CatalogStatus.error;
+        // Keep whatever is already on screen. Replacing a working page with an
+        // error because a background refresh failed is worse than showing
+        // slightly old products and saying so.
+        _status = _all.isEmpty ? CatalogStatus.error : CatalogStatus.ready;
+        _isStale = _all.isNotEmpty;
     }
 
     // Categories are a nicety: if that call fails, derive them from the

@@ -53,7 +53,9 @@ class ProductImage extends StatelessWidget {
 /// Neutral greys, not theme colors: product art always sits on a white plate,
 /// so a dark-theme placeholder would punch a black hole through it.
 const Color _plateFill = Color(0xFFEDEDF0);
-const Color _plateInk = Color(0xFF9A9AA5);
+// Dark enough to clear the 3:1 WCAG asks of a non-text element against the
+// placeholder plate; the lighter grey this started as was 2.4:1.
+const Color _plateInk = Color(0xFF6E6E7A);
 
 class _Placeholder extends StatelessWidget {
   const _Placeholder();

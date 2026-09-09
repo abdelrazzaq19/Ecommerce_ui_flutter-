@@ -65,15 +65,21 @@ void main() {
     test('round-trips product ids', () async {
       final store = await openStore();
 
-      await store.writeWishlist({3, 1});
+      await store.writeWishlist([3, 1]);
 
-      expect(store.readWishlist(), {3, 1});
+      expect(store.readWishlist(), [3, 1]);
+    });
+
+    test('drops duplicates but keeps the saved order', () async {
+      final store = await openStore({'wishlist': '[5, 2, 5, 9]'});
+
+      expect(store.readWishlist(), [5, 2, 9]);
     });
 
     test('ignores non-integer entries in a corrupt list', () async {
       final store = await openStore({'wishlist': '[1, "two", null, 3]'});
 
-      expect(store.readWishlist(), {1, 3});
+      expect(store.readWishlist(), [1, 3]);
     });
   });
 
@@ -94,12 +100,12 @@ void main() {
         () async {
       final store = await openStore();
       await store.writeSession(const {'email': 'ada@example.test'});
-      await store.writeWishlist({7});
+      await store.writeWishlist([7]);
 
       await store.clearSession();
 
       expect(store.readSession(), isNull);
-      expect(store.readWishlist(), {7});
+      expect(store.readWishlist(), [7]);
     });
 
     test('a corrupt session reads as signed out rather than throwing',
@@ -218,7 +224,7 @@ void main() {
     test('wipes every key the app owns', () async {
       final store = await openStore();
       await store.writeCart({1: 1});
-      await store.writeWishlist({2});
+      await store.writeWishlist([2]);
       await store.writeSession(const {'email': 'ada@example.test'});
       await store.addSearch('shoes');
       await store.writeCachedCatalog(<Product>[fakeProducts.first]);

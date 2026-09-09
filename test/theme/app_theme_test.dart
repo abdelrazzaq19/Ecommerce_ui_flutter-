@@ -44,6 +44,70 @@ void main() {
       }
     });
 
+    test('the pairs the app actually paints also clear AA', () {
+      for (final theme in [AppTheme.light, AppTheme.dark]) {
+        final scheme = theme.colorScheme;
+        final pairs = <String, List<Color>>{
+          // Secondary text: product titles, hints, timestamps.
+          'onSurfaceVariant on surface': [
+            scheme.surface,
+            scheme.onSurfaceVariant,
+          ],
+          // The same text inside a card, which is a different surface tone.
+          'onSurfaceVariant on card': [
+            scheme.surfaceContainerLow,
+            scheme.onSurfaceVariant,
+          ],
+          'onSurface on card': [scheme.surfaceContainerLow, scheme.onSurface],
+          // Filter chips and the navigation indicator.
+          'onSecondaryContainer on secondaryContainer': [
+            scheme.secondaryContainer,
+            scheme.onSecondaryContainer,
+          ],
+          // Avatars and the checkout step numbers.
+          'onPrimaryContainer on primaryContainer': [
+            scheme.primaryContainer,
+            scheme.onPrimaryContainer,
+          ],
+          // Inputs and the quantity stepper.
+          'onSurface on surfaceContainerHighest': [
+            scheme.surfaceContainerHighest,
+            scheme.onSurface,
+          ],
+          // Bottom bars: cart totals, the purchase bar.
+          'onSurface on surfaceContainer': [
+            scheme.surfaceContainer,
+            scheme.onSurface,
+          ],
+        };
+
+        pairs.forEach((name, colors) {
+          expect(
+            _contrast(colors[0], colors[1]),
+            greaterThanOrEqualTo(4.5),
+            reason: '$name in ${theme.brightness.name}',
+          );
+        });
+      }
+    });
+
+    test('the colors painted on the white product plate clear AA', () {
+      // The rating pill and the heart sit on product art, which is always on a
+      // white plate, so they are styled against white rather than the theme.
+      const white = Color(0xFFFFFFFF);
+      const pillBackground = Color(0xFF474747); // black at 72% over white
+      const pillText = Color(0xFFFFFFFF);
+      const heartInactive = Color(0xFF6B6B76);
+      const plateFill = Color(0xFFEDEDF0);
+      const plateInk = Color(0xFF6E6E7A);
+
+      expect(_contrast(pillBackground, pillText), greaterThanOrEqualTo(4.5));
+      expect(_contrast(white, heartInactive), greaterThanOrEqualTo(3.0),
+          reason: 'an icon is a non-text element; AA asks 3:1');
+      expect(_contrast(plateFill, plateInk), greaterThanOrEqualTo(3.0),
+          reason: 'the fallback image glyph is non-text');
+    });
+
     testWidgets('dark theme paints a dark scaffold', (tester) async {
       await tester.pumpWidget(
         MaterialApp(

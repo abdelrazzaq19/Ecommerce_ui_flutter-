@@ -1,6 +1,6 @@
 # TODO: Ecommerce App Modernization
 
-Plan: [tasks/plan.md](plan.md) · Status: Tasks 7-12 + visual polish done, awaiting your commit · Updated 2026-09-08
+Plan: [tasks/plan.md](plan.md) · Status: ALL 20 TASKS DONE. Tasks 1-12 committed; Tasks 13-20 awaiting your commit · Updated 2026-09-08
 
 Verify commands: `flutter analyze` · `flutter test` · `flutter run -d chrome`
 
@@ -151,48 +151,108 @@ Verify commands: `flutter analyze` · `flutter test` · `flutter run -d chrome`
   - [x] 19 new tests. Two real layout bugs found by them: the filter row overflowed 26px at 400dp with a long sort label, and the sort sheet overflowed 60px on a short phone
   - [x] Theme fix: unselected and selected chips were both `secondaryContainer`, so a selected filter looked identical to the rest of the row
 
-- [ ] **Task 13 — Auth: login, register with validation, persisted session** (M, needs T6, T8)
-  - [ ] Name/email/phone/password rules each block submit with inline errors
-  - [ ] Session survives restart; logout clears it
-  - [ ] Labelled as a local demo account
+- [x] **Task 13 — Auth: login, register with validation, persisted session** (M, needs T6, T8) — DONE (uncommitted)
+  - [x] `Validators` as pure functions: name, email, phone (digit count, tolerant of + spaces brackets dashes), password, new password (letters + numbers), confirmation
+  - [x] Registration page exists at last — the README has claimed it since the first commit
+  - [x] Each field shows its own inline error live and blocks submit; verified in the browser with four bad fields at once
+  - [x] Session persists; verified by a full page reload in the built web app
+  - [x] Sign out asks first, ends the session, and **keeps the account** — signing out is not deleting your account
+  - [x] Signing back in with just email + password restores the registered name and phone
+  - [x] No password is stored anywhere, not even hashed; a test asserts the stored session contains no password
+  - [x] Every screen says plainly that accounts are local and nothing is sent to a server
+  - [x] Profile shows initials avatar, name, email, phone; `UserSession` model with JSON round-trip
+  - [x] `LocalStore` gains an `accounts` key, separate from `session`
+  - [x] 30 new tests
 
-- [ ] **Task 14 — Wishlist** (M, needs T6, T7, T8)
-  - [ ] Heart toggles on card and detail; persists across restart; move-to-cart works
+- [x] **Task 14 — Wishlist** (M, needs T6, T7, T8) — DONE (uncommitted)
+  - [x] `WishlistProvider` stores ids only and resolves through `CatalogProvider`, the same as the cart
+  - [x] Heart on the product card (home and search results) and in the detail app bar; both drive the same state
+  - [x] Newest saved first — `LocalStore` now keeps wishlist order instead of a `Set`
+  - [x] Persists across restart; verified by reloading the built web app
+  - [x] Move to cart adds the product, removes it from Saved, and offers "View cart"
+  - [x] Removing from the Saved tab offers Undo
+  - [x] A saved id the catalog no longer has is skipped in the grid but kept in storage — a wishlist can outlive a product
+  - [x] Empty state links back to the catalog
+  - [x] 20 new tests
 
 ### ▣ Checkpoint C — Core Shopping Flow
-- [ ] End-to-end: browse, filter, search, detail, add to cart, restart, cart intact
-- [ ] Defects B1-B12 all fixed, each covered by a test
+- [x] End-to-end verified in the built web app: browse, filter, sort, search, detail, add to cart, save, sign in, reload — cart, wishlist and session all intact
+- [x] Defects B1-B12 all fixed, each covered by a test
+- [x] `flutter analyze` clean under `strict-casts` and `strict-raw-types`; 213 tests green
 - [ ] Human review
 
 ---
 
 ## Phase 3: Real-World Features and Polish
 
-- [ ] **Task 15 — Checkout with address form and confirmation** (M, needs T10, T13)
-  - [ ] Auth guard routes to login and resumes
-  - [ ] Address validation blocks Place Order; success clears the cart and shows an order id
-  - [ ] States plainly that it is a demo order — no payment, no card details collected
+- [x] **Task 15 — Checkout with address form and confirmation** (M, needs T10, T13) — DONE (uncommitted)
+  - [x] Auth guard shows the sign-in prompt **in place** rather than throwing the shopper out; the form appears the moment the session exists, so the cart is never lost
+  - [x] Address form validates all five fields with its own inline error each; a blocked order keeps the cart intact
+  - [x] Prefills from the last address used, falling back to the signed-in profile
+  - [x] Placing an order clears the cart, records it, saves the address, and pushes a confirmation with a readable id (`ORD-20260909-DUBB`)
+  - [x] `Order` / `OrderLine` / `ShippingAddress` models; lines snapshot the price paid, so a later price change cannot rewrite history
+  - [x] `OrderProvider` persists through `LocalStore`; a corrupt stored order degrades to an empty one instead of taking the history down
+  - [x] Empty cart cannot be checked out
+  - [x] Checkout and confirmation both state outright that no payment is taken and no card details are asked for — and none are
+  - [x] `LocalStore` is now provided to the widget tree, so a screen can read or write one key without its own provider
+  - [x] 14 new tests; verified end to end in the built web app
 
-- [ ] **Task 16 — Order history and reorder** (S, needs T15)
-  - [ ] Orders persist, newest first; detail shows purchased prices; Reorder refills the cart
+- [x] **Task 16 — Order history and reorder** (S, needs T15) — DONE (uncommitted)
+  - [x] History list, newest first, with date, item count and total; reachable from Profile with a live order count
+  - [x] Order detail shows every line at the price paid, plus the delivery address and totals breakdown
+  - [x] Reorder refills the cart at today's prices and switches to the cart tab
+  - [x] Reorder skips products the store no longer sells and says how many; an order of only discontinued items adds nothing and says so
+  - [x] Empty history state links back to the catalog
+  - [x] **No invented delivery status.** There is no fulfilment behind this app, so no "Shipped" badge — a test asserts none of those words appear
+  - [x] 10 new tests; verified live: history showed 2 x $79.95 paid while the catalog now sells that product at $109.95, and reorder put it in the cart at $109.95
 
-- [ ] **Task 17 — Profile and settings, persisted dark mode** (S, needs T13, T16)
-  - [ ] System/Light/Dark applies instantly and survives restart; logout confirms first
+- [x] **Task 17 — Profile and settings, persisted dark mode** (S, needs T13, T16) — DONE (uncommitted)
+  - [x] `SettingsProvider` owns the theme; the app root watches only it, so a cart change does not rebuild the whole app
+  - [x] Three-way picker (System / Light / Dark) — a switch would strand anyone who tried Dark with no way back to the device setting
+  - [x] Applies instantly and survives restart; verified live with the browser in dark mode and the app held to Light
+  - [x] About card with the app version
+  - [x] "Erase local data" behind a confirmation — clears cart, wishlist, orders, search history and session **through the providers**, so memory and disk cannot disagree
+  - [x] Signed-out profile keeps its sign-in and register calls to action; sign-out still confirms first (Task 13)
+  - [x] 10 new tests, including an app-level one asserting `MaterialApp.themeMode` changes and comes back after a restart
 
-- [ ] **Task 18 — Offline resilience: catalog cache** (M, needs T6, T7)
-  - [ ] Second launch renders from cache; offline shows cached data with a banner
-  - [ ] Offline with no cache shows error + retry
+- [x] **Task 18 — Offline resilience: catalog cache** (M, needs T6, T7) — DONE (uncommitted)
+  - [x] `CatalogProvider` seeds from the cache **synchronously in its constructor**, so a second launch opens on products, not a spinner
+  - [x] A seeded start refreshes in the background rather than flashing skeletons over products already on screen
+  - [x] A failed refresh keeps the working page and raises an offline banner instead of replacing it with an error
+  - [x] Offline with no cache still shows the full error + retry state
+  - [x] A successful refresh rewrites the cache and clears the banner; an empty response clears it too rather than pretending
+  - [x] `OfflineBanner` says how old the data is in plain words ("12 minutes ago", "3 days ago")
+  - [x] `LocalStore.writeCachedCatalog` now writes catalog and timestamp together — a reader that finds one must find the other
+  - [x] 12 new tests
+  - Deviation: caching lives in `CatalogProvider`, not a repository decorator as the plan sketched. The provider needs a synchronous read for the instant first paint, and splitting the cache across two layers would have meant reading it in both.
+  - **Not verified live:** the offline banner. Simulating a dead network in the browser pane could not be made to work, and the pane's gestures/screenshots were flaky. Cache writing was confirmed live; the offline states rest on the three widget tests that drive `HomePage` directly.
 
-- [ ] **Task 19 — Accessibility and polish pass** (M, needs T7-T18)
-  - [ ] Semantics labels on all icon-only controls; 48x48 dp targets
-  - [ ] No overflow at 320 dp or 2.0x text scale; AA contrast in both themes
+- [x] **Task 19 — Accessibility and polish pass** (M, needs T7-T18) — DONE (uncommitted)
+  - [x] `test/a11y_test.dart` sweeps all 13 screens at 320dp and again at 2.0x text scale, asserts every `IconButton` carries a tooltip, and measures tap targets
+  - [x] **Seven real overflows found and fixed**, all invisible at desktop size:
+    - product grid cards overflowed 16px at 2.0x — the aspect ratio now loosens with the text scale
+    - checkout city/postal fields overflowed at 320dp — they stack when they do not fit
+    - the theme picker overflowed 97px — three segments of icon + label cannot fit a narrow phone at 2x, so it becomes a stacked list
+    - checkout section headings, review lines and totals, order-history totals, order-detail lines and the profile phone row all needed `Flexible`
+  - [x] Contrast tests widened from 3 pairs to the 7 the app actually paints, in both themes, plus the fixed colors on the white product plate
+  - [x] Found by that: the fallback image glyph was **2.4:1** against its placeholder, below the 3:1 WCAG asks of a non-text element. Darkened to 4.1:1
+  - [x] Card title and price merged into one spoken node; haptics on add-to-cart and save
+  - [x] 29 new tests (289 total)
 
-- [ ] **Task 20 — README rewrite** (XS, needs T19)
-  - [ ] Every listed feature exists; setup works from a clean clone; demo scope stated
+- [x] **Task 20 — README rewrite** (XS, needs T19) — DONE (uncommitted)
+  - [x] Every listed feature now exists. The old one claimed Riverpod (the app uses Provider), clean architecture, sorting by popularity, price-range filters and review display — none of which were ever built
+  - [x] Demo scope stated at the top: catalog real and read-only, accounts/orders/delivery simulated, **no payment taken and no card details collected**
+  - [x] Setup instructions match the actual remote and directory name
+  - [x] Documents the API constraints that shaped the code (ignored `offset` and `q`, 20 products)
+  - [x] Accessibility guarantees and known limitations stated, including why orders carry no delivery status
 
 ### ▣ Checkpoint D — Complete
-- [ ] All acceptance criteria met · analyze clean · tests green · manual full-flow pass
-- [ ] Ready for review
+- [x] All 20 tasks meet their acceptance criteria
+- [x] `flutter analyze` clean under `strict-casts` and `strict-raw-types`
+- [x] 289 tests green across 22 files; none touch the network
+- [x] `flutter build web` succeeds; app verified running
+- [x] README accurate
+- [ ] Human review · Tasks 13-20 still awaiting your commit
 
 ---
 

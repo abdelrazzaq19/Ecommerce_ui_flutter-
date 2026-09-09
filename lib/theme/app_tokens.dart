@@ -59,6 +59,9 @@ abstract final class AppSizes {
   /// A single product reads better in a narrower column than the grid does.
   static const double detailContentWidth = 900;
 
+  /// Forms read badly full-width; a single column of fields is enough.
+  static const double formWidth = 480;
+
   static const double skeletonRowHeight = 220;
 }
 
@@ -79,6 +82,13 @@ abstract final class AppBreakpoints {
     if (width < 1000) return 3;
     return 4;
   }
+
+  /// Card aspect ratio for the product grid, loosened as text grows.
+  ///
+  /// The title and price under a card need more vertical room at a large
+  /// accessibility text scale; a fixed ratio overflows the card instead.
+  static double gridAspectRatio(double textScale) =>
+      0.74 / textScale.clamp(1.0, 1.6);
 
   static bool isCompact(double width) => width < compact;
   static bool isExpanded(double width) => width >= expanded;

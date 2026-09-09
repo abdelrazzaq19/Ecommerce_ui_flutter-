@@ -5,6 +5,7 @@ import '../models/product.dart';
 import '../state/cart_provider.dart';
 import '../state/catalog_provider.dart';
 import '../state/search_provider.dart';
+import '../state/wishlist_provider.dart';
 import '../theme/app_tokens.dart';
 import '../widgets/app_states.dart';
 import '../widgets/product_card.dart';
@@ -107,14 +108,21 @@ class _SearchPageState extends State<SearchPage> {
           crossAxisCount: AppBreakpoints.columnsForWidth(constraints.maxWidth),
           crossAxisSpacing: AppSpacing.md,
           mainAxisSpacing: AppSpacing.md,
-          childAspectRatio: 0.74,
+          childAspectRatio: AppBreakpoints.gridAspectRatio(
+                        MediaQuery.textScalerOf(context).scale(1),
+                      ),
         ),
         itemCount: results.length,
         itemBuilder: (context, index) {
           final product = results[index];
+          final wishlist = context.watch<WishlistProvider>();
+
           return ProductCard(
             key: ValueKey(product.id),
             product: product,
+            isFavorite: wishlist.contains(product.id),
+            onFavoriteToggle: () =>
+                context.read<WishlistProvider>().toggle(product.id),
             onAddToCart: () {
               context.read<CartProvider>().addToCart(product);
               ScaffoldMessenger.of(context)

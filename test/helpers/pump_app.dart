@@ -1,8 +1,12 @@
+import 'package:ecommerce_app/services/local_store.dart';
 import 'package:ecommerce_app/state/auth_provider.dart';
 import 'package:ecommerce_app/state/cart_provider.dart';
 import 'package:ecommerce_app/state/catalog_provider.dart';
+import 'package:ecommerce_app/state/order_provider.dart';
 import 'package:ecommerce_app/state/search_provider.dart';
+import 'package:ecommerce_app/state/settings_provider.dart';
 import 'package:ecommerce_app/state/shell_tab_controller.dart';
+import 'package:ecommerce_app/state/wishlist_provider.dart';
 import 'package:ecommerce_app/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -38,6 +42,7 @@ Future<void> pumpApp(
   await tester.pumpWidget(
     MultiProvider(
       providers: [
+        Provider<LocalStore?>.value(value: null),
         ChangeNotifierProvider(
           create: (_) =>
               catalog ??
@@ -46,9 +51,16 @@ Future<void> pumpApp(
                 autoLoad: false,
               ),
         ),
-        ChangeNotifierProvider(create: (_) => AuthProvider()),
+        // Zero latency: the simulated submit delay would make every widget
+        // test wait on a timer for nothing.
+        ChangeNotifierProvider(
+          create: (_) => AuthProvider(latency: Duration.zero),
+        ),
         ChangeNotifierProvider(create: (_) => CartProvider()),
         ChangeNotifierProvider(create: (_) => SearchProvider()),
+        ChangeNotifierProvider(create: (_) => WishlistProvider()),
+        ChangeNotifierProvider(create: (_) => OrderProvider()),
+        ChangeNotifierProvider(create: (_) => SettingsProvider()),
         ChangeNotifierProvider(create: (_) => ShellTabController()),
         ...providers,
       ],

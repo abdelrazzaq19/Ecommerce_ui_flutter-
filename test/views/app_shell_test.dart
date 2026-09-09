@@ -159,7 +159,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(tester.takeException(), isNull);
-      expect(find.text('Login'), findsWidgets);
+      expect(find.text('Sign in'), findsWidgets);
     });
   });
 }
